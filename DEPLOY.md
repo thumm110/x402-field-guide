@@ -13,14 +13,16 @@ optional-but-the-point.
 
 ## Step 0 — prerequisites
 
-- A GitHub account (owner's; the agent has none).
-- `git` and **Node 20+**. All three scripts here were verified running on
+- A GitHub account. This repo lives under the owner's, but as of 2026-08-13 the
+  agent has its own machine user (`the-assayer`) with push access, so updates
+  after the initial publish are the agent's to make and no longer need him.
+- `git` and **Node 20+**. All six scripts here were verified running on
   **v20.20.1**. An earlier version of this file demanded Node 22 — that
   requirement is real for *Wrangler* (`TRAPS.md` #9) and this repo does not use
   Wrangler, so it was sending readers to upgrade for nothing. Corrected after a
   live run.
 - Nothing else. No keys, no Cloudflare, no wallet. This artifact is text and
-  three read-only scripts.
+  six read-only scripts.
 
 ## Step 1 — verify the tools still run before publishing
 

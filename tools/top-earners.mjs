@@ -27,10 +27,17 @@
 const DISCOVERY = 'https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources';
 const UA = 'PageDistill-Census/1.0 (+https://pagedistill.thumm.workers.dev; x402 Bazaar demand survey; read-only)';
 const PAGE = 1000;
-const SANE_MAX_USD = 100;
 
 const argv = process.argv.slice(2);
 const argOf = (f, d) => { const i = argv.indexOf(f); return i === -1 ? d : argv[i + 1]; };
+// --max-price: the absurd-price cutoff. 68 listings quote prices up to $10bn, so
+// a naive sum of the index reads ~$350bn. Everything here excludes listings above
+// this. It is a *threshold choice, not a measurement*, and it moves the headline:
+// $5 and $100 differ by ~20% on the same pull. Publish the range, not one number.
+// It is a flag rather than a constant so both ends come out of the SAME price
+// extraction — recomputing the other cutoff with a second parser is how you get
+// two numbers that are not comparable and do not know it.
+const SANE_MAX_USD = Number(argOf('--max-price', 100));
 const TOP = Number(argOf('--top', 40));
 const JSON_OUT = argOf('--json', null);
 // --grep: print every listing whose description/resource matches, ranked by

@@ -1,10 +1,20 @@
 # What the x402 Bazaar Actually Earns
 
-**A measured census of every listing in the x402 discovery index, and thirteen
-failure modes that will silently eat your deploy.**
+**A census of every listing in the x402 discovery index — as reported by the
+index, corroborated in aggregate on-chain at 0.81× — and thirteen failure modes
+that will silently eat your deploy.**
 
-Measured 2026-08-10. Reproduce any number here with the tools in `tools/` — they
-need no account, no API key, and no payment.
+Measured 2026-08-10, reconciled against Base on 2026-08-13, re-measured
+2026-08-14. Reproduce any number
+here with the tools in `tools/` — they need no account, no API key, and no
+payment.
+
+**Read the label literally.** Every revenue figure below originates in telemetry
+the index publishes about itself. A reader (`hermessol`) pointed out that calls,
+payers and price are one witness wearing three hats, so I reconciled them against
+actual USDC transfers on Base: the top-12 cohort claims $5,111.58/30d and the
+chain shows $4,149.91, **0.81×**. That corroborates the *total*. It says nothing
+about any individual row — see [Is any of this real?](#is-any-of-this-real-i-checked-it-against-the-chain).
 
 ---
 
@@ -47,7 +57,9 @@ round.
 | Share of all calls taken by the top 2 listings | **39%** |
 
 **That is the headline: the entire x402 economy is a mid-single-digit-thousands
-of dollars per month, and eleven listings out of 14,646 clear sixty dollars.**
+of dollars per month, and eleven listings out of 14,646 clear sixty dollars**
+(11 of 14,646 on 2026-08-10; 13 of 15,492 when re-measured four days later —
+the shape is what is stable, not the integer).
 
 ### Why the gross is a range and not a number
 
@@ -66,32 +78,115 @@ $19.86 buy-anything endpoint, a $5 prepaid card, a $6 blockchain-intelligence
 query). Both cutoffs are defensible. Neither is precise. Treat the market as
 **"under ten thousand dollars a month"** and you will not be wrong.
 
-### The index churns, so I measured it twice
+### The index churns, so I measured it three times
 
-Pull A and pull B above are the same script run about five hours apart on the
-same day. Nothing in between was edited. What moved:
+Pulls A and B are the same script run about five hours apart on 2026-08-10. Pull
+C is four days later. Nothing was edited in between, and both cutoffs in every
+column come out of the same price extraction in the same run — recomputing one
+of them with a second parser is how you end up with two numbers that are not
+comparable and do not know it.
 
-| | pull A | pull B | Δ |
+| | A · 08-10 | B · 08-10 +5h | C · 08-14 |
 |---|---|---|---|
-| listings in the index | 14,646 | 14,504 | −142 |
-| paid calls, 30d | 351,531 | 350,515 | −1,016 |
-| listings with ≥3 payers | 1,471 (10.0%) | 1,472 (10.1%) | +1 |
-| gross, ≤$5 cutoff | $7,852 | $7,242 | **−7.8%** |
-| gross, ≤$100 cutoff | $9,612 | $9,624 | +0.1% |
-| listings ≥$60 / 30d | 11 | 11 | — |
+| listings in the index | 14,646 | 14,504 | **15,492** |
+| paid calls, 30d | 351,531 | 350,515 | **339,337** |
+| listings with ≥3 payers | 1,471 (10.0%) | 1,472 (10.1%) | 1,567 (10.1%) |
+| gross, ≤$5 cutoff | $7,852 | $7,242 | $7,632 |
+| gross, ≤$100 cutoff | $9,612 | $9,624 | $9,528 |
+| listings ≥$60 / 30d | 11 | 11 | 13 |
 
-Two things worth having. First, **the raw counts drift about 1% in a few hours**
-— quote them with a date or don't quote them. Second, **the cheap end is where
-the churn lives**: an 7.8% swing at the ≤$5 cutoff against 0.1% at ≤$100, which
-means a small number of high-volume penny listings entering or leaving moves the
-"honest" total far more than anything at the top does. If you are going to
-disagree with one number in this document, disagree with $7,242.
+Three things worth having. First, **the raw counts drift about 1% in a few
+hours** — quote them with a date or don't quote them. Second, **the cheap end is
+where the churn lives**: ±8% at the ≤$5 cutoff against a 1.0% total spread at
+≤$100 across four days, so a small number of high-volume penny listings entering
+or leaving moves the "honest" total far more than anything at the top does. If
+you are going to disagree with one number in this document, disagree with the
+≤$5 one.
 
-**What did not move is the part you would build on:** eleven listings clear $60
-in both pulls, the top of the table is the same names in the same order, and the
-market is under $10k/month either way. The conclusions are stable across two
-independent measurements; the decimals are not. That is the honest shape of it,
-and it is why the tools are in this repo rather than just the tables.
+Third, and it is new in pull C: **supply is growing and demand is not.**
+Listings are up 5.8% in four days while paid calls are down 3.5%. One pull pair
+could not see that and two on the same day could not either — it needs a
+baseline days apart. If it holds, the per-listing arithmetic gets worse for a
+new seller every week, which sharpens rather than softens the conclusion at the
+bottom of this file.
+
+**What did not move is the part you would build on:** the top of the table is
+the same names in the same order, a low-double-digit number of listings clear
+$60, and the market is under $10k/month in all three pulls — measured at $9,528
+in the most recent, so that claim now stands on a 4.7% margin and has held for
+four days. The conclusions are stable across three independent measurements; the
+decimals are not. That is the honest shape of it, and it is why the tools are in
+this repo rather than just the tables.
+
+### Is any of this real? I checked it against the chain
+
+Every number above comes from one source: the index's own `quality` block. Calls,
+payers and price are three columns of a single response, so their agreement
+proves nothing. The independent counterpart is unusually cheap on this rail,
+because x402 settles on a public blockchain — so I counted the money.
+
+`tools/onchain-reconcile.mjs` takes the top listings by claimed 30-day gross,
+reads each one's declared `payTo` address, and counts price-matched inbound USDC
+transfers to it on Base over the same 30 days.
+
+| | |
+|---|---|
+| Cohort | top 12 `payTo` addresses by claimed gross |
+| Claimed by the index | **$5,111.58 / 30d** |
+| Observed on-chain | **$4,149.91 / 30d** |
+| Ratio | **0.81×** |
+| Rows within 0.68×–1.69× | 7 of 12 |
+| Rows at ≤0.10× | 3 of 12 |
+| Rows at exactly zero | 1 |
+
+**The aggregate survives. The rows do not.** And the zero is not a small listing:
+it is **Tavily Search**, the index's third-largest claimed earner — 38,786 paid
+calls, 423 unique payers, $387.86/30d — whose declared `payTo` shows **0 inbound
+transfers across an exhaustive scan of the full 30 days, 0 outbound, and a zero
+balance.**
+
+Three things follow, and the third is the one to carry away:
+
+1. **`payTo` is a routing field, not an authorization field.** It says where a
+   payment is *directed*, never where it *settled*. Settlement can be routed,
+   batched or netted elsewhere, and nothing in the index distinguishes those from
+   a fabricated number.
+2. **Never use `l30DaysUniquePayers` as a traction filter.** Measured against
+   on-chain distinct senders it misses in both directions: 269 vs 61, 423 vs 0,
+   6 vs 103. It is also the cheapest field in the record to inflate — three
+   wallets cost nothing — so it can *veto* traction and never confirm it.
+3. **A sum is structurally blind to attribution.** 0.81× would read exactly the
+   same if every dollar landed and every single one belonged to a different
+   listing than the one it is credited to. Conservation is a witness about *how
+   much*; it has nothing to say about *whose*. So the honest label is
+   **corroborated in aggregate, unverified per listing — and no amount of further
+   aggregation can turn the one into the other.**
+
+Use the per-listing ceilings below to *reject* build ideas, which is what they are
+sound for: over-reporting makes a ceiling too high, and a too-high ceiling that
+still fails to clear your costs is a safe rejection. Do not use them to justify
+one.
+
+### Does the index answer the same question the same way twice?
+
+Two controls, both suggested by readers, both in `tools/`:
+
+- **`page-size-control.mjs`** — two full pulls fired at the same instant,
+  differing only in page size (1,000 vs 250). **14,986 records each, identical ID
+  multisets, zero duplicates.** Client-side pagination omission is ruled out.
+- **`repeat-control.mjs`** — the sharper one. Varying page size is only a control
+  if the suspect is downstream of page size; if the index degraded under
+  concurrent load, two concurrent pulls would degrade *together* and their
+  agreement would be manufactured by the shared failure. So: call the identical
+  thing repeatedly and diff the bytes. Sequentially, 4×: byte-identical, same
+  rows, same order, every field. Then 16 identical calls fired **concurrently**:
+  16/16 fulfilled, all byte-identical to the sequential hash.
+
+**The endpoint is a pure function of `(limit, offset)` under 16× concurrency.**
+What that does *not* establish is completeness: an index that deterministically
+omits the same rows at every page size and every pressure prints exactly this
+output. Determinism is not completeness, and the residual needs a witness that is
+not the index.
 
 ### Two statistics that look like signal and are noise
 
@@ -214,10 +309,17 @@ That is a fact about 2026, not about the technology.
 | `tools/top-earners.mjs` | rank the whole index by revenue; `--grep` any niche for its ceiling |
 | `tools/bazaar-census.mjs` | full census: prices, payer distribution, liveness probing, `--niche` |
 | `tools/bazaar-check.mjs` | is *my* endpoint actually listed? exits non-zero if not |
+| `tools/onchain-reconcile.mjs` | count real USDC on Base against what the index claims a listing earned |
+| `tools/page-size-control.mjs` | two same-instant pulls at different page sizes; diffs the ID multiset |
+| `tools/repeat-control.mjs` | the degenerate control: identical call ×N, sequential and concurrent, diffed at the byte level |
 
-Requirements: Node 22+. No keys, no accounts, no payments. Every tool reads the
-public discovery API `api.cdp.coinbase.com/platform/v2/x402/discovery/resources`,
-which is anonymous.
+Requirements: **Node 20+**. All six scripts were verified running on v20.20.1.
+An earlier version of this file said Node 22+, which was wrong and would have
+sent you to upgrade for nothing — that requirement belongs to Wrangler
+(`TRAPS.md` #9), not to anything in this repo. No keys, no accounts, no
+payments. Every tool reads the public discovery API
+`api.cdp.coinbase.com/platform/v2/x402/discovery/resources`, which is anonymous;
+`onchain-reconcile.mjs` additionally reads public Base RPC.
 
 ```bash
 node tools/top-earners.mjs --cache /tmp/bazaar.json --top 45
