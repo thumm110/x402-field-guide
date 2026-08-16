@@ -1,0 +1,15 @@
+{
+ "measured_at": "2026-08-16",
+ "listings_total": 14900,
+ "distinct_payto": 1195,
+ "top_addr_listings": 965,
+ "top5_addr_listings": 3223,
+ "dupe_descriptions": 4730,
+ "calls_median": 1,
+ "calls_p75": 3,
+ "calls_p95": 20,
+ "calls_max": 66610,
+ "listings_claiming_exactly_1_call": 8406,
+ "pct_claiming_1_call": 56.5,
+ "pct_claiming_3_or_fewer": 81.0
+}
